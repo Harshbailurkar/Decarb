@@ -42,21 +42,39 @@ with col1:
     st.subheader("🏠 Home Energy Usage (in kWh)")
     home_energy = st.slider("Home Energy", 0.0, 1000.0, key="home_energy_input")
 
-    st.subheader("🏭 Manufacturing Output (units)")
-    manufacturing = st.slider("Manufacturing", 0.0, 1000.0, key="manufacturing_input")
-
-with col2:
-    st.subheader("🍽️ Waste generated per week (in kg)")
-    waste = st.slider("Waste", 0.0, 100.0, key="waste_input")
-
     st.subheader("🍽️ Number of meals per day")
     meals = st.number_input("Meals", 0, key="meals_input")
+
+    st.subheader("🍽️ Waste generated per week (in kg)")
+    waste = st.slider("Waste", 0.0, 100.0, key="waste_input")
 
     st.subheader("🚜 Agriculture Output (kg)")
     agriculture = st.slider("Agriculture", 0.0, 1000.0, key="agriculture_input")
 
     st.subheader("🌳 Logging Output (kg)")
     logging = st.slider("Logging", 0.0, 1000.0, key="logging_input")
+
+with col2:
+    st.subheader("🏭 Manufacturing Output (units)")
+    manufacturing = st.slider("Manufacturing", 0.0, 1000.0, key="manufacturing_input")
+
+    st.subheader("♻️ Recycling Rate (kg)")
+    recycling = st.slider("Recycling", 0.0, 1000.0, key="recycling_input")
+
+    st.subheader("🚆 Public Transport Usage (in km)")
+    public_transport = st.slider("Public Transport", 0.0, 1000.0, key="public_transport_input")
+
+    st.subheader("🍏 Vegetarian Diet (kg)")
+    vegetarian_diet = st.slider("Vegetarian Diet", 0.0, 100.0, key="vegetarian_diet_input")
+
+    st.subheader("🏗️ Construction Output (units)")
+    construction = st.slider("Construction", 0.0, 1000.0, key="construction_input")
+
+    st.subheader("⚡ Renewable Energy Usage (in kWh)")
+    renewable_energy = st.slider("Renewable Energy", 0.0, 1000.0, key="renewable_energy_input")
+
+    st.subheader("⚗️ Chemical Processing Output (units)")
+    chemical_processing = st.slider("Chemical Processing", 0.0, 1000.0, key="chemical_processing_input")
 
 # Calculate carbon emissions only if inputs are provided
 emissions = {}
@@ -84,6 +102,24 @@ if agriculture > 0:
 
 if logging > 0:
     emissions["Logging"] = EMISSION_FACTORS[country]["Logging"] * logging
+
+if recycling > 0:
+    emissions["Recycling"] = EMISSION_FACTORS[country]["Recycling Rate"] * recycling
+
+if public_transport > 0:
+    emissions["Public Transport"] = EMISSION_FACTORS[country]["Public Transport"] * public_transport
+
+if vegetarian_diet > 0:
+    emissions["Vegetarian Diet"] = EMISSION_FACTORS[country]["Vegetarian Diet"] * vegetarian_diet
+
+if construction > 0:
+    emissions["Construction"] = EMISSION_FACTORS[country]["Construction"] * construction
+
+if renewable_energy > 0:
+    emissions["Renewable Energy"] = EMISSION_FACTORS[country]["Renewable Energy"] * renewable_energy
+
+if chemical_processing > 0:
+    emissions["Chemical Processing"] = EMISSION_FACTORS[country]["Chemical Processing"] * chemical_processing
 
 # Convert emissions to tonnes and round off to 2 decimal points
 total_emissions = round(sum(emissions.values()) / 1000, 2)
