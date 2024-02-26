@@ -1,7 +1,7 @@
 import streamlit as st
 
 # Define emission factors (example values, replace with accurate data)
-EMISSION_FACTORS = {
+EMISSION_FACTORS_INDIVIDUAL = {
     "India": {
         "Transportation": 0.14,  # kgCO2/km
         "Electricity": 0.82,  # kgCO2/kWh
@@ -12,6 +12,11 @@ EMISSION_FACTORS = {
         "Recycling Rate": 0.2,  # kgCO2/kg (example value)
         "Renewable Energy": -0.3,  # Negative value for carbon credits from renewable energy
         "Vegetarian Diet": -0.5,  # Negative value for carbon credits from vegetarian diet
+    }
+}
+
+EMISSION_FACTORS_INDUSTRY = {
+    "India": {
         "Manufacturing": 1.0,  # kgCO2/unit (example value)
         "Construction": 2.5,  # kgCO2/unit (example value)
         "Chemical Processing": 3.0,  # kgCO2/unit (example value)
@@ -21,118 +26,115 @@ EMISSION_FACTORS = {
 }
 
 # Set wide layout and page name
-st.set_page_config(layout="wide", page_title="Personal Carbon Calculator")
+st.set_page_config(layout="wide", page_title="Carbon Calculator")
 
 # Streamlit app code
-st.title("Personal Carbon Calculator App ⚠️")
+st.title("Carbon Calculator App ⚠️")
 
-# User inputs
-st.subheader("🌍 Your Country")
-country = st.selectbox("Select", ["India"])
+# User selects whether they are an individual or industry
+user_type = st.radio("Are you an individual or an industry?", ("Individual", "Industry"))
 
-col1, col2 = st.columns(2)
+if user_type == "Individual":
+    # Individual inputs
+    st.subheader("🌍 Your Country (Individual)")
+    country_individual = st.selectbox("Select", ["India"])
 
-with col1:
-    st.subheader("🚗 Daily commute distance (in km)")
-    distance = st.slider("Distance", 0.0, 100.0, key="distance_input")
+    col1, col2 = st.columns(2)
 
-    st.subheader("💡 Monthly electricity consumption (in kWh)")
-    electricity = st.slider("Electricity", 0.0, 1000.0, key="electricity_input")
+    with col1:
+        st.subheader("🚗 Daily commute distance (in km)")
+        distance = st.slider("Distance", 0.0, 100.0, key="distance_input")
 
-    st.subheader("🏠 Home Energy Usage (in kWh)")
-    home_energy = st.slider("Home Energy", 0.0, 1000.0, key="home_energy_input")
+        st.subheader("💡 Monthly electricity consumption (in kWh)")
+        electricity = st.slider("Electricity", 0.0, 1000.0, key="electricity_input")
 
-    st.subheader("🍽️ Number of meals per day")
-    meals = st.number_input("Meals", 0, key="meals_input")
+        st.subheader("🏠 Home Energy Usage (in kWh)")
+        home_energy = st.slider("Home Energy", 0.0, 1000.0, key="home_energy_input")
 
-    st.subheader("🍽️ Waste generated per week (in kg)")
-    waste = st.slider("Waste", 0.0, 100.0, key="waste_input")
+        st.subheader("🍽️ Number of meals per day")
+        meals = st.number_input("Meals", 0, key="meals_input")
 
-    st.subheader("🚜 Agriculture Output (kg)")
-    agriculture = st.slider("Agriculture", 0.0, 1000.0, key="agriculture_input")
+        st.subheader("🍽️ Waste generated per week (in kg)")
+        waste = st.slider("Waste", 0.0, 100.0, key="waste_input")
 
-    st.subheader("🌳 Logging Output (kg)")
-    logging = st.slider("Logging", 0.0, 1000.0, key="logging_input")
+    with col2:
+        st.subheader("🚜 Agriculture Output (kg)")
+        agriculture = st.slider("Agriculture", 0.0, 1000.0, key="agriculture_input")
 
-with col2:
-    st.subheader("🏭 Manufacturing Output (units)")
-    manufacturing = st.slider("Manufacturing", 0.0, 1000.0, key="manufacturing_input")
+        st.subheader("🌳 Logging Output (kg)")
+        logging = st.slider("Logging", 0.0, 1000.0, key="logging_input")
 
-    st.subheader("♻️ Recycling Rate (kg)")
-    recycling = st.slider("Recycling", 0.0, 1000.0, key="recycling_input")
+    # Calculate carbon emissions only if inputs are provided
+    emissions_individual = {}
 
-    st.subheader("🚆 Public Transport Usage (in km)")
-    public_transport = st.slider("Public Transport", 0.0, 1000.0, key="public_transport_input")
+    if distance > 0:
+        emissions_individual["Transportation"] = EMISSION_FACTORS_INDIVIDUAL[country_individual]["Transportation"] * distance
 
-    st.subheader("🍏 Vegetarian Diet (kg)")
-    vegetarian_diet = st.slider("Vegetarian Diet", 0.0, 100.0, key="vegetarian_diet_input")
+    if electricity > 0:
+        emissions_individual["Electricity"] = EMISSION_FACTORS_INDIVIDUAL[country_individual]["Electricity"] * electricity
 
-    st.subheader("🏗️ Construction Output (units)")
-    construction = st.slider("Construction", 0.0, 1000.0, key="construction_input")
+    if home_energy > 0:
+        emissions_individual["Home Energy"] = EMISSION_FACTORS_INDIVIDUAL[country_individual]["Home Energy"] * home_energy
 
-    st.subheader("⚡ Renewable Energy Usage (in kWh)")
-    renewable_energy = st.slider("Renewable Energy", 0.0, 1000.0, key="renewable_energy_input")
+    if meals > 0:
+        emissions_individual["Diet"] = EMISSION_FACTORS_INDIVIDUAL[country_individual]["Diet"] * meals
 
-    st.subheader("⚗️ Chemical Processing Output (units)")
-    chemical_processing = st.slider("Chemical Processing", 0.0, 1000.0, key="chemical_processing_input")
+    if waste > 0:
+        emissions_individual["Waste"] = EMISSION_FACTORS_INDIVIDUAL[country_individual]["Waste"] * waste
 
-# Calculate carbon emissions only if inputs are provided
-emissions = {}
+    if agriculture > 0:
+        emissions_individual["Agriculture"] = EMISSION_FACTORS_INDIVIDUAL[country_individual]["Agriculture"] * agriculture
 
-if distance > 0:
-    emissions["Transportation"] = EMISSION_FACTORS[country]["Transportation"] * distance
+    if logging > 0:
+        emissions_individual["Logging"] = EMISSION_FACTORS_INDIVIDUAL[country_individual]["Logging"] * logging
 
-if electricity > 0:
-    emissions["Electricity"] = EMISSION_FACTORS[country]["Electricity"] * electricity
+    # Convert emissions to tonnes and round off to 2 decimal points
+    total_emissions_individual = round(sum(emissions_individual.values()) / 1000, 2)
 
-if home_energy > 0:
-    emissions["Home Energy"] = EMISSION_FACTORS[country]["Home Energy"] * home_energy
+    # Calculate total emissions for individuals
+    if st.button("Calculate Carbon Emission Score (Individual)"):
+        # Display results
+        st.header("Results (Individual)")
 
-if manufacturing > 0:
-    emissions["Manufacturing"] = EMISSION_FACTORS[country]["Manufacturing"] * manufacturing
+        st.subheader("Carbon Emissions by Category (Individual)")
+        for category, emission in emissions_individual.items():
+            st.info(f"{category}: {emission} tonnes CO2 per year")
 
-if meals > 0:
-    emissions["Diet"] = EMISSION_FACTORS[country]["Diet"] * meals
+        st.subheader("Total Carbon Emission Score (Individual)")
+        st.success(f"🌍 Your total carbon emission score (Individual) is: {total_emissions_individual} tonnes CO2 per year")
 
-if waste > 0:
-    emissions["Waste"] = EMISSION_FACTORS[country]["Waste"] * waste
+else:  # For industries
+    # Industry inputs
+    st.subheader("🌍 Your Country (Industry)")
+    country_industry = st.selectbox("Select", ["India"])
 
-if agriculture > 0:
-    emissions["Agriculture"] = EMISSION_FACTORS[country]["Agriculture"] * agriculture
+    col1, col2 = st.columns(2)
 
-if logging > 0:
-    emissions["Logging"] = EMISSION_FACTORS[country]["Logging"] * logging
+    with col1:
+        st.subheader("🏭 Manufacturing Output (units)")
+        manufacturing = st.slider("Manufacturing", 0.0, 1000.0, key="manufacturing_input")
 
-if recycling > 0:
-    emissions["Recycling"] = EMISSION_FACTORS[country]["Recycling Rate"] * recycling
+        st.subheader("🏗️ Construction Output (units)")
+        construction = st.slider("Construction", 0.0, 1000.0, key="construction_input")
 
-if public_transport > 0:
-    emissions["Public Transport"] = EMISSION_FACTORS[country]["Public Transport"] * public_transport
+        st.subheader("⚗️ Chemical Processing Output (units)")
+        chemical_processing = st.slider("Chemical Processing", 0.0, 1000.0, key="chemical_processing_input")
 
-if vegetarian_diet > 0:
-    emissions["Vegetarian Diet"] = EMISSION_FACTORS[country]["Vegetarian Diet"] * vegetarian_diet
+    with col2:
+        st.subheader("🚆 Public Transport Usage (in km)")
+        public_transport = st.slider("Public Transport", 0.0, 1000.0, key="public_transport_input")
 
-if construction > 0:
-    emissions["Construction"] = EMISSION_FACTORS[country]["Construction"] * construction
+    # Calculate carbon emissions only if inputs are provided
+    emissions_industry = {}
 
-if renewable_energy > 0:
-    emissions["Renewable Energy"] = EMISSION_FACTORS[country]["Renewable Energy"] * renewable_energy
+    if manufacturing > 0:
+        emissions_industry["Manufacturing"] = EMISSION_FACTORS_INDUSTRY[country_industry]["Manufacturing"] * manufacturing
 
-if chemical_processing > 0:
-    emissions["Chemical Processing"] = EMISSION_FACTORS[country]["Chemical Processing"] * chemical_processing
+    if construction > 0:
+        emissions_industry["Construction"] = EMISSION_FACTORS_INDUSTRY[country_industry]["Construction"] * construction
 
-# Convert emissions to tonnes and round off to 2 decimal points
-total_emissions = round(sum(emissions.values()) / 1000, 2)
+    if chemical_processing > 0:
+        emissions_industry["Chemical Processing"] = EMISSION_FACTORS_INDUSTRY[country_industry]["Chemical Processing"] * chemical_processing
 
-# Calculate total emissions
-if st.button("Calculate Carbon Emission Score"):
-
-    # Display results
-    st.header("Results")
-
-    st.subheader("Carbon Emissions by Category")
-    for category, emission in emissions.items():
-        st.info(f"{category}: {emission} tonnes CO2 per year")
-
-    st.subheader("Total Carbon Emission Score")
-    st.success(f"🌍 Your total carbon emission score is: {total_emissions} tonnes CO2 per year")
+    if public_transport > 0:
+        emissions_industry["Public Transport"] = EMISSION_FACTORS_INDI
