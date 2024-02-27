@@ -39,8 +39,8 @@ ADDITIONAL_EMISSION_FACTORS_INDUSTRY = {
     }
 }
 
-# Set wide layout and page name
-st.set_page_config(layout="wide", page_title="Carbon Calculator")
+# Set page title
+st.set_page_config(page_title="Carbon Calculator", layout="wide")
 
 # Streamlit app code
 st.title("Carbon Calculator App ⚠️")
@@ -69,13 +69,13 @@ if user_type == "Individual":
 
     if data_source == "Manual":
         total_emissions_individual = calculate_individual_emissions(data_individual, country_individual)
-        st.write(f"Total Carbon Emissions (Individual): {total_emissions_individual} kgCO2")
+        st.write(f"**Total Carbon Emissions (Individual):** {total_emissions_individual} kgCO2")
 
         # Display emissions breakdown in a bar chart
         st.subheader("Carbon Emissions Breakdown (Individual)")
         df_individual = pd.DataFrame(data_individual.items(), columns=["Category", "Value"])
         fig_individual = px.bar(df_individual, x="Category", y="Value", title="Carbon Emissions Breakdown (Individual)", labels={"Value": "Quantity"})
-        st.plotly_chart(fig_individual)
+        st.plotly_chart(fig_individual, use_container_width=True)
 
         # Suggestions for reducing carbon footprint
         st.subheader("Suggestions for Reducing Carbon Footprint (Individual)")
@@ -116,13 +116,13 @@ else:
 
     if data_source == "Manual":
         total_emissions_industry = calculate_industry_emissions(data_industry, country_industry)
-        st.write(f"Total Carbon Emissions (Industry): {total_emissions_industry} kgCO2")
+        st.write(f"**Total Carbon Emissions (Industry):** {total_emissions_industry} kgCO2")
 
         # Display emissions breakdown in a bar chart
         st.subheader("Carbon Emissions Breakdown (Industry)")
         df_industry = pd.DataFrame(data_industry.items(), columns=["Category", "Value"])
         fig_industry = px.bar(df_industry, x="Category", y="Value", title="Carbon Emissions Breakdown (Industry)", labels={"Value": "Quantity"})
-        st.plotly_chart(fig_industry)
+        st.plotly_chart(fig_industry, use_container_width=True)
 
         # Suggestions for reducing carbon footprint
         st.subheader("Suggestions for Reducing Carbon Footprint (Industry)")
